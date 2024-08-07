@@ -9,7 +9,32 @@
 
 #define NO_SECTION NULL
 
-typedef struct IniProperty
+enum TokenType
+{
+    BOOL = 0,
+    INTEGER,
+    FLOAT,
+    STRING,
+    WHITESPACE,
+    UNKOWN,
+    END,
+};
+
+typedef struct
+{
+    const unsigned start;
+    const unsigned end;
+    const std::string literal;
+} TextSpan;
+
+typedef struct
+{
+    const TokenType type;
+    const TextSpan span;
+
+} Token;
+
+typedef struct
 {
     const std::string section;
     const std::string identifier;
@@ -21,6 +46,8 @@ class IniParser
 private:
     std::stringstream ss;
     bool loaded;
+
+    void tokenize();
 
 public:
     IniParser();
