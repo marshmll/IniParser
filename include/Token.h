@@ -8,8 +8,11 @@ enum TokenType
     INTEGER,
     FLOAT,
     STRING,
+    SECTION,
+    ASSIGNMENT,
     WHITESPACE,
     NEWLINE,
+    IDENTIFIER,
     UNKOWN,
     END,
 };

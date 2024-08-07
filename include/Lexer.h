@@ -21,9 +21,23 @@ private:
 
     const int consume_integer();
 
+    const std::string consume_string();
+
+    const std::string consume_section();
+
+    const std::string consume_identifier();
+
     std::optional<char> current_char();
 
     const bool is_num_start(const char &c);
+
+    const bool is_string_start(const char &c);
+
+    const bool is_section_start(const char &c);
+
+    const bool is_assignment(const char &c);
+
+    const bool is_whitespace(const char &c);
 
     const bool is_newline(const char &c);
 
