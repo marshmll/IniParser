@@ -31,7 +31,6 @@ typedef struct
 {
     const TokenType type;
     const TextSpan span;
-
 } Token;
 
 typedef struct
@@ -44,8 +43,12 @@ typedef struct
 class IniParser
 {
 private:
-    std::stringstream ss;
+    std::stringstream fileSstream;
+    std::vector<Token> tokens;
+
     bool loaded;
+
+    const bool load_sstream(const std::string path);
 
     void tokenize();
 
