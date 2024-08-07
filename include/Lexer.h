@@ -19,6 +19,7 @@ private:
 
     std::optional<char> consume();
 
+
     const int consume_integer();
 
     const std::string consume_string();
@@ -27,7 +28,11 @@ private:
 
     const std::string consume_identifier();
 
+    const bool consume_bool();
+    
     std::optional<char> current_char();
+
+    const bool is_boolean();
 
     const bool is_num_start(const char &c);
 

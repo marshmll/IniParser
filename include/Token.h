@@ -4,14 +4,13 @@
 
 enum TokenType
 {
-    BOOL,
     INTEGER,
-    FLOAT,
     STRING,
     SECTION,
     ASSIGNMENT,
     WHITESPACE,
     NEWLINE,
+    BOOLEAN,
     IDENTIFIER,
     UNKOWN,
     END,

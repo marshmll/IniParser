@@ -49,6 +49,11 @@ std::optional<Token> Lexer::get_next_token()
         type = TokenType::NEWLINE;
         consume();
     }
+    else if (is_boolean())
+    {
+        type = TokenType::BOOLEAN;
+        consume_bool();
+    }
     else
     {
         type = TokenType::IDENTIFIER;
@@ -144,7 +149,7 @@ const std::string Lexer::consume_identifier()
     {
         char c = current_char().value();
 
-        if (is_newline(c) || is_whitespace(c))
+        if (is_newline(c) || is_whitespace(c) || is_assignment(c) || is_string_start(c))
             break;
 
         identifier.push_back(c);
@@ -152,6 +157,33 @@ const std::string Lexer::consume_identifier()
     }
 
     return identifier;
+}
+
+const bool Lexer::consume_bool()
+{
+    std::string literal;
+    bool boolean = false;
+
+    while (current_char().has_value())
+    {
+        char c = current_char().value();
+
+        literal.push_back(c);
+
+        consume();
+
+        if (literal == "false")
+        {
+            boolean = false;
+            break;
+        }
+        else if (literal == "true")
+        {
+            boolean = true;
+            break;
+        }
+    }
+    return boolean;
 }
 
 std::optional<char> Lexer::current_char()
@@ -190,6 +222,12 @@ const bool Lexer::is_whitespace(const char &c)
 const bool Lexer::is_newline(const char &c)
 {
     return c == '\n';
+}
+
+const bool Lexer::is_boolean()
+{
+    return fileString.substr(currentPosition, 5) == "false" ||
+           fileString.substr(currentPosition, 4) == "true";
 }
 
 Lexer::Lexer(std::stringstream &file_sstream)
