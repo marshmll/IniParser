@@ -11,7 +11,7 @@ const bool IniParser::load_sstream(const std::string path)
             fileSstream << buf;
         this->loaded = true;
 
-        std::cout << fileSstream.str();
+        // std::cout << fileSstream.str();
 
         ifs.close();
 
@@ -23,9 +23,16 @@ const bool IniParser::load_sstream(const std::string path)
 
 void IniParser::tokenize()
 {
-    for (char &c : fileSstream.str())
+    lexer = new Lexer(fileSstream);
+
+    tokens = lexer->tokenize();
+
+    for (auto &token : tokens)
     {
-        std::cout << c << "\n";
+        std::cout << "type: " << token.getType() << "\n"
+                  << "start: " << token.getSpan().start << "\n"
+                  << "end: " << token.getSpan().end << "\n"
+                  << "literal: \"" << token.getSpan().literal << "\"\n\n";
     }
 }
 
@@ -33,6 +40,7 @@ IniParser::IniParser() : loaded(false) {}
 
 IniParser::~IniParser()
 {
+    delete lexer;
 }
 
 const bool IniParser::loadFromFile(const std::string path)

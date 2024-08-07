@@ -1,37 +1,10 @@
 #pragma once
 
-#include <stdbool.h>
-
-#include <iostream>
-#include <vector>
-#include <sstream>
 #include <fstream>
 
+#include "Lexer.h"
+
 #define NO_SECTION NULL
-
-enum TokenType
-{
-    BOOL = 0,
-    INTEGER,
-    FLOAT,
-    STRING,
-    WHITESPACE,
-    UNKOWN,
-    END,
-};
-
-typedef struct
-{
-    const unsigned start;
-    const unsigned end;
-    const std::string literal;
-} TextSpan;
-
-typedef struct
-{
-    const TokenType type;
-    const TextSpan span;
-} Token;
 
 typedef struct
 {
@@ -43,6 +16,8 @@ typedef struct
 class IniParser
 {
 private:
+    Lexer *lexer;
+
     std::stringstream fileSstream;
     std::vector<Token> tokens;
 
