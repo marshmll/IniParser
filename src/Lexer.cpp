@@ -14,6 +14,13 @@ std::optional<Token> Lexer::get_next_token()
         return Token(TokenType::END, TextSpan(0, 0, eof_literal));
     }
 
+    while (is_comment_start(current_char().value()))
+    {
+        consume_comment();
+        if (!current_char().has_value())
+            return {};
+    }
+
     char c = current_char().value();
 
     TokenType type = TokenType::UNKOWN;
@@ -73,6 +80,22 @@ std::optional<char> Lexer::consume()
     ++currentPosition;
 
     return c;
+}
+
+void Lexer::consume_comment()
+{
+    while (current_char().has_value())
+    {
+        char c = current_char().value();
+
+        if (is_newline(c))
+        {
+            consume();
+            break;
+        }
+
+        consume();
+    }
 }
 
 const int Lexer::consume_integer()
@@ -192,6 +215,11 @@ std::optional<char> Lexer::current_char()
         return fileString.at(currentPosition);
 
     return {};
+}
+
+const bool Lexer::is_comment_start(const char &c)
+{
+    return c == ';';
 }
 
 const bool Lexer::is_num_start(const char &c)
