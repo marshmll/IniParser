@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "IniParser.h"
 
 int main(void)

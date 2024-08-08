@@ -1,10 +1,5 @@
 #pragma once
 
-#include <iostream>
-#include <vector>
-#include <sstream>
-#include <optional>
-
 #include "Token.h"
 
 class Lexer

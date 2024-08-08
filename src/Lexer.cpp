@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "Lexer.h"
 
 std::optional<Token> Lexer::get_next_token()

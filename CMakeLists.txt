@@ -6,4 +6,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 add_executable(IniParser src/main.cpp)
 add_subdirectory(src)
 
+target_precompile_headers(IniParser PRIVATE include/stdafx.h)
+
 target_include_directories(IniParser PRIVATE include)

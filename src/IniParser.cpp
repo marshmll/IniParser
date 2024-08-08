@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "IniParser.h"
 
 const bool IniParser::load_sstream(const std::string path)
@@ -29,11 +30,29 @@ void IniParser::tokenize()
 
     for (auto &token : tokens)
     {
-        std::cout << "*****TOKEN*****" << "\n"
-                  << "type: " << token.getType() << "\n"
-                  << "start: " << token.getSpan().start << "\n"
-                  << "end: " << token.getSpan().end << "\n"
-                  << "literal: \"" << token.getSpan().literal << "\"\n\n";
+        std::cout << "\n______TOKEN______" << "\n"
+                  //   << "type: " << token.getType() << "\n"
+                  //   << "start: " << token.getSpan().start << "\n"
+                  //   << "end: " << token.getSpan().end << "\n"
+                  << "literal: \"" << token.getSpan().literal << "\"\n";
+
+        switch (token.getType())
+        {
+        case TokenType::INTEGER:
+            std::cout << "value: " << std::atoi(token.getSpan().literal.c_str()) << "\n";
+            break;
+
+        case TokenType::STRING:
+            std::cout << "value: " << token.getSpan().literal.substr(1, token.getSpan().literal.size() - 2) << "\n";
+            break;
+
+        case TokenType::BOOLEAN:
+            std::cout << "value: " << (token.getSpan().literal == "true") << "\n";
+            break;
+
+        default:
+            break;
+        }
     }
 }
 

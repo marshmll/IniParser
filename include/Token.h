@@ -24,6 +24,7 @@ private:
 
 public:
     Token(const TokenType type, const TextSpan span);
+    Token(const TokenType type);
     ~Token();
 
     const TokenType &getType() const;
