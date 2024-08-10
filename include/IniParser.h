@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Lexer.h"
+#include "Parser.h"
 
 #define NO_SECTION NULL
 
@@ -15,6 +16,7 @@ class IniParser
 {
 private:
     Lexer *lexer;
+    Parser * parser;
 
     std::stringstream fileSstream;
     std::vector<Token> tokens;
@@ -22,8 +24,6 @@ private:
     bool loaded;
 
     const bool load_sstream(const std::string path);
-
-    void tokenize();
 
 public:
     IniParser();

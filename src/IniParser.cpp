@@ -12,7 +12,7 @@ const bool IniParser::load_sstream(const std::string path)
             fileSstream << buf;
         this->loaded = true;
 
-        std::cout << fileSstream.str() << "\n";
+        // std::cout << fileSstream.str() << "\n";
 
         ifs.close();
 
@@ -22,45 +22,16 @@ const bool IniParser::load_sstream(const std::string path)
     return false;
 }
 
-void IniParser::tokenize()
+IniParser::IniParser() : loaded(false)
 {
-    lexer = new Lexer(fileSstream);
-
-    tokens = lexer->tokenize();
-
-    for (auto &token : tokens)
-    {
-        std::cout << "\n______TOKEN______" << "\n"
-                  //   << "type: " << token.getType() << "\n"
-                  //   << "start: " << token.getSpan().start << "\n"
-                  //   << "end: " << token.getSpan().end << "\n"
-                  << "literal: \"" << token.getSpan().literal << "\"\n";
-
-        switch (token.getType())
-        {
-        case TokenType::INTEGER:
-            std::cout << "value: " << std::atoi(token.getSpan().literal.c_str()) << "\n";
-            break;
-
-        case TokenType::STRING:
-            std::cout << "value: " << token.getSpan().literal.substr(1, token.getSpan().literal.size() - 2) << "\n";
-            break;
-
-        case TokenType::BOOLEAN:
-            std::cout << "value: " << (token.getSpan().literal == "true") << "\n";
-            break;
-
-        default:
-            break;
-        }
-    }
+    lexer = new Lexer();
+    parser = new Parser();
 }
-
-IniParser::IniParser() : loaded(false) {}
 
 IniParser::~IniParser()
 {
     delete lexer;
+    delete parser;
 }
 
 const bool IniParser::loadFromFile(const std::string path)
@@ -68,9 +39,25 @@ const bool IniParser::loadFromFile(const std::string path)
     loaded = load_sstream(path);
 
     if (!loaded)
+    {
         std::cerr << "[IniParser::IniParser] (ERROR): Unable to load file (" << path << "). Aborting." << "\n";
+    }
     else
-        tokenize();
+    {
+        tokens = lexer->tokenize(fileSstream);
+
+        // for (auto &token : tokens)
+        // {
+        //     std::cout << "\n______TOKEN______" << "\n"
+        //               << "type: " << token.getTypeName() << "\n"
+        //               << "start: " << token.getSpan().start << "\n"
+        //               << "end: " << token.getSpan().end << "\n"
+        //               << "literal: \"" << token.getSpan().literal << "\"\n"
+        //               << "value: \"" << token.getValue() << "\"\n";
+        // }
+
+        parser->loadTokens(tokens);
+    }
 
     return loaded;
 }

@@ -21,12 +21,16 @@ class Token
 private:
     TokenType type;
     TextSpan span;
+    std::string value;
 
 public:
-    Token(const TokenType type, const TextSpan span);
+    Token(const TokenType type, const TextSpan span, const std::string value);
     Token(const TokenType type);
     ~Token();
 
     const TokenType &getType() const;
     const TextSpan &getSpan() const;
+    const std::string &getValue() const;
+
+    const std::string getTypeName() const;
 };

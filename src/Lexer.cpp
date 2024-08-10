@@ -12,7 +12,7 @@ std::optional<Token> Lexer::get_next_token()
 
         std::string eof_literal = "\0";
 
-        return Token(TokenType::END, TextSpan(0, 0, eof_literal));
+        return Token(TokenType::END, TextSpan(0, 0, eof_literal), "\\0");
     }
 
     while (is_comment_start(current_char().value()))
@@ -25,54 +25,58 @@ std::optional<Token> Lexer::get_next_token()
     char c = current_char().value();
 
     TokenType type = TokenType::UNKOWN;
+    std::string value = "";
     const unsigned start = currentPosition;
 
     if (is_num_start(c))
     {
         type = TokenType::INTEGER;
-        consume_integer();
+        value = consume_integer();
     }
     else if (is_string_start(c))
     {
         type = TokenType::STRING;
-        consume_string();
+        value = consume_string();
     }
     else if (is_section_start(c))
     {
         type = TokenType::SECTION;
-        consume_section();
+        value = consume_section();
     }
     else if (is_assignment(c))
     {
         type = TokenType::ASSIGNMENT;
+        value = "=";
         consume();
     }
     else if (is_whitespace(c))
     {
         type = TokenType::WHITESPACE;
+        value = " ";
         consume();
     }
     else if (is_newline(c))
     {
         type = TokenType::NEWLINE;
+        value = "\\n";
         consume();
     }
     else if (is_boolean())
     {
         type = TokenType::BOOLEAN;
-        consume_bool();
+        value = consume_bool();
     }
     else
     {
         type = TokenType::IDENTIFIER;
-        consume_identifier();
+        value = consume_identifier();
     }
 
     const unsigned end = currentPosition;
     const std::string literal = fileString.substr(start, end - start);
     const TextSpan span = TextSpan(start, end, literal);
 
-    return Token(type, span);
+    return Token(type, span, value);
 }
 
 std::optional<char> Lexer::consume()
@@ -99,9 +103,9 @@ void Lexer::consume_comment()
     }
 }
 
-const int Lexer::consume_integer()
+const std::string Lexer::consume_integer()
 {
-    int number = 0;
+    std::string number;
 
     while (current_char().has_value())
     {
@@ -110,7 +114,7 @@ const int Lexer::consume_integer()
         if (isdigit(c))
         {
             consume();
-            number = number * 10 + static_cast<int>(c);
+            number.push_back(c);
         }
         else
         {
@@ -157,6 +161,11 @@ const std::string Lexer::consume_section()
             consume();
             break;
         }
+        else if (is_whitespace(c))
+        {
+            consume();
+            continue;
+        }
 
         section.push_back(c);
         consume();
@@ -183,30 +192,28 @@ const std::string Lexer::consume_identifier()
     return identifier;
 }
 
-const bool Lexer::consume_bool()
+const std::string Lexer::consume_bool()
 {
-    std::string literal;
-    bool boolean = false;
+    std::string boolean;
 
     while (current_char().has_value())
     {
         char c = current_char().value();
 
-        literal.push_back(c);
+        boolean.push_back(c);
 
         consume();
 
-        if (literal == "false")
+        if (boolean == "false")
         {
-            boolean = false;
             break;
         }
-        else if (literal == "true")
+        else if (boolean == "true")
         {
-            boolean = true;
             break;
         }
     }
+
     return boolean;
 }
 
@@ -259,11 +266,10 @@ const bool Lexer::is_boolean()
            fileString.substr(currentPosition, 4) == "true";
 }
 
-Lexer::Lexer(std::stringstream &file_sstream)
+Lexer::Lexer()
 {
-    fileString = file_sstream.str();
-    fSize = (unsigned)fileString.size();
-
+    fileString = "";
+    fSize = 0;
     currentPosition = 0;
 }
 
@@ -271,8 +277,11 @@ Lexer::~Lexer()
 {
 }
 
-std::vector<Token> Lexer::tokenize()
+std::vector<Token> Lexer::tokenize(std::stringstream &file_sstream)
 {
+    fileString = file_sstream.str();
+    fSize = fileString.size();
+
     std::vector<Token> tokens;
 
     std::optional<Token> token = get_next_token();

@@ -9,7 +9,7 @@ fi
 cp src/file.ini build/bin/file.ini
 
 cd build
-make
+make &&
 cd bin
 ./IniParser
 cd ../../

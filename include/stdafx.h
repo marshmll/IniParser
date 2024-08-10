@@ -1,5 +1,4 @@
-#ifndef HEADER_H
-#define HEADER_H
+#pragma once
 
 #include <algorithm>
 #include <deque>
@@ -16,5 +15,3 @@
 #include <sstream>
 #include <fstream>
 #include <filesystem>
-
-#endif

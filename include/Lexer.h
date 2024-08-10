@@ -16,7 +16,7 @@ private:
 
     void consume_comment();
 
-    const int consume_integer();
+    const std::string consume_integer();
 
     const std::string consume_string();
 
@@ -24,7 +24,7 @@ private:
 
     const std::string consume_identifier();
 
-    const bool consume_bool();
+    const std::string consume_bool();
 
     std::optional<char> current_char();
 
@@ -45,9 +45,9 @@ private:
     const bool is_boolean();
 
 public:
-    Lexer(std::stringstream &file_sstream);
+    Lexer();
 
     ~Lexer();
 
-    std::vector<Token> tokenize();
+    std::vector<Token> tokenize(std::stringstream &file_sstream);
 };
