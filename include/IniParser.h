@@ -5,13 +5,6 @@
 
 #define NO_SECTION NULL
 
-typedef struct
-{
-    const std::string section;
-    const std::string identifier;
-    const std::string value;
-} IniProperty;
-
 class IniParser
 {
 private:
@@ -32,7 +25,9 @@ public:
 
     const bool loadFromFile(const std::string path);
 
-    const std::vector<IniProperty> getAllProperties();
+    const std::string getProperty(const std::string section, const std::string identifier);
 
-    const std::vector<IniProperty> getAllProperties(const std::string section);
+    const std::vector<std::pair<std::string, std::string>> getAllProperties();
+
+    const std::vector<std::pair<std::string, std::string>> getAllProperties(const std::string section);
 };

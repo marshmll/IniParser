@@ -28,14 +28,19 @@ const std::optional<std::string> Parser::parse_assignment_expression(const std::
 
     while (current_token().has_value())
     {
+        std::string expression_literal;
+
         if (current_token().value().getType() == TokenType::IDENTIFIER)
         {
             if (current_token().value().getSpan().literal == identifier)
             {
+                expression_literal.append(current_token().value().getSpan().literal);
                 consume_token();
 
                 while (current_token().has_value())
                 {
+                    expression_literal.append(current_token().value().getSpan().literal);
+
                     if (current_token().value().getType() == TokenType::ASSIGNMENT)
                     {
                         consume_token();
@@ -44,6 +49,7 @@ const std::optional<std::string> Parser::parse_assignment_expression(const std::
                         {
                             if (current_token().value().getType() == TokenType::WHITESPACE)
                             {
+                                expression_literal.append(current_token().value().getSpan().literal);
                                 consume_token();
                             }
                             else if (current_token().value().getType() == TokenType::NEWLINE ||
@@ -53,7 +59,11 @@ const std::optional<std::string> Parser::parse_assignment_expression(const std::
                                      current_token().value().getType() == TokenType::UNKOWN ||
                                      current_token().value().getType() == TokenType::END)
                             {
-                                std::cerr << "Syntax error." << "\n";
+                                expression_literal.append(current_token().value().getSpan().literal);
+
+                                std::cerr << "\033[1;31m[IniParser]: Invalid assignment expression:\033[0m" << "\n"
+                                          << "\033[1;33m" << expression_literal << "\033[0m" << "\n";
+
                                 return {};
                             }
                             else
@@ -62,9 +72,16 @@ const std::optional<std::string> Parser::parse_assignment_expression(const std::
                             }
                         }
                     }
-                    else
+                    else if (current_token().value().getType() == TokenType::WHITESPACE)
                     {
                         consume_token();
+                    }
+                    else
+                    {
+                        std::cerr << "\033[1;31m[IniParser]: Akward expression:\033[0m" << "\n"
+                                  << "\033[1;33m\"" << expression_literal << "\033[0m" << "\n";
+
+                        return {};
                     }
                 }
             }
@@ -86,6 +103,31 @@ const std::optional<std::string> Parser::parse_assignment_expression(const std::
     return {};
 }
 
+const std::vector<std::pair<std::string, std::string>> Parser::parse_identifier_value_pairs(const bool in_section)
+{
+    std::vector<std::pair<std::string, std::string>> pairs;
+    for (auto &token : tokens)
+    {
+        std::pair<std::string, std::string> pair;
+
+        if (token.getType() == TokenType::IDENTIFIER)
+        {
+            pair.first = token.getValue();
+
+            std::optional<std::string> value = parse_assignment_expression(token.getValue(), in_section);
+
+            if (value.has_value())
+            {
+                pair.second = value.value();
+
+                pairs.push_back(pair);
+            }
+        }
+    }
+
+    return pairs;
+}
+
 const bool Parser::seek_section(const std::string section)
 {
     reset_position();
@@ -99,11 +141,9 @@ const bool Parser::seek_section(const std::string section)
                 return true;
             }
         }
-
         consume_token();
     }
 
-    reset_position();
     return false;
 }
 
@@ -128,6 +168,49 @@ Parser::~Parser()
 void Parser::loadTokens(std::vector<Token> &tokens)
 {
     this->tokens = tokens;
+}
 
-    std::cout << parse_assignment_expression("Fullscreen").value_or("Not found.") << "\n";
+const std::string Parser::getProperty(const std::string section, const std::string identifier)
+{
+    if (seek_section(section))
+    {
+        std::optional<std::string> value = parse_assignment_expression(identifier, true);
+
+        if (value.has_value())
+        {
+            return value.value();
+        }
+        else
+        {
+            std::cerr << "\033[1;31m[IniParser]: Inexistent or invalid identifier:\033[0m" << "\n"
+                      << "\033[1;33m" << identifier << "\033[0m" << "\n"
+                      << "\033[1;31mIn section:\033[0m" << "\n"
+                      << "\033[1;33m" << section << "\033[0m" << "\n";
+
+            return std::string();
+        }
+    }
+    else
+    {
+        std::cerr << "\033[1;31m[IniParser]: Inexistent section:\033[0m" << "\n"
+                  << "\033[1;33m" << section << "\033[0m" << "\n";
+    }
+
+    return std::string();
+}
+
+const std::vector<std::pair<std::string, std::string>> Parser::getAllProperties()
+{
+    return parse_identifier_value_pairs();
+}
+
+const std::vector<std::pair<std::string, std::string>> Parser::getAllProperties(const std::string section)
+{
+    if (seek_section(section))
+        return parse_identifier_value_pairs(true);
+
+    std::cerr << "\033[1;31m[IniParser]: Inexistent section:\033[0m" << "\n"
+              << "\033[1;33m" << section << "\033[0m" << "\n";
+
+    return std::vector<std::pair<std::string, std::string>>();
 }

@@ -7,5 +7,11 @@ int main(void)
 
     parser.loadFromFile("file.ini");
 
+    for (auto &[identifier, value] : parser.getAllProperties("Graphics"))
+    {
+        std::cout << "identifier: " << identifier << "\n"
+                  << "value: " << value << "\n";
+    }
+
     exit(EXIT_SUCCESS);
 }

@@ -137,20 +137,25 @@ const std::string Lexer::consume_string()
         if (c == '"')
         {
             consume();
-            break;
+            return str;
         }
 
         str.push_back(c);
         consume();
     }
 
+    std::cerr << "\033[1;31m[IniParser]: Expected string closing:\033[0m" << "\n"
+              << "\033[1;33m\"" << str << "\033[0m" << "\n";
+
     return str;
 }
 
 const std::string Lexer::consume_section()
 {
+    std::string literal;
     std::string section;
-    consume();
+
+    literal.push_back(consume().value());
 
     while (current_char().has_value())
     {
@@ -158,18 +163,41 @@ const std::string Lexer::consume_section()
 
         if (c == ']')
         {
-            consume();
-            break;
+            literal.push_back(consume().value());
+
+            if (section.size() == 0)
+            {
+                std::cerr << "\033[1;31m[IniParser]: Empty section:\033[0m" << "\n"
+                          << "\033[1;33m" << literal << "\033[0m" << "\n";
+            }
+
+            while (is_whitespace(section.at(section.size() - 1)))
+                section.erase(section.size() - 1, 1);
+
+            while (is_whitespace(section.at(0)))
+                section.erase(0, 1);
+
+            return section;
         }
         else if (is_whitespace(c))
         {
-            consume();
+            section.push_back(c);
+
+            literal.push_back(consume().value());
             continue;
+        }
+        else if (is_section_start(c))
+        {
+            std::cerr << "\033[1;31m[IniParser]: Missing closing bracket in section:\033[0m" << "\n"
+                      << "\033[1;33m" << literal << "\033[0m" << "\n";
         }
 
         section.push_back(c);
-        consume();
+        literal.push_back(consume().value());
     }
+
+    std::cerr << "\033[1;31m[IniParser]: Missing closing bracket in section:\033[0m" << "\n"
+              << "\033[1;33m" << literal << "\033[0m" << "\n";
 
     return section;
 }

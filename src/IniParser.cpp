@@ -62,16 +62,32 @@ const bool IniParser::loadFromFile(const std::string path)
     return loaded;
 }
 
-const std::vector<IniProperty> IniParser::getAllProperties()
+const std::string IniParser::getProperty(const std::string section, const std::string identifier)
 {
     if (!loaded)
     {
         std::cerr << "[IniParser::getAllProperties] (ERROR): No file loaded." << "\n";
     }
-    return std::vector<IniProperty>();
+
+    return parser->getProperty(section, identifier);
 }
 
-const std::vector<IniProperty> IniParser::getAllProperties(const std::string section)
+const std::vector<std::pair<std::string, std::string>> IniParser::getAllProperties()
 {
-    return std::vector<IniProperty>();
+    if (!loaded)
+    {
+        std::cerr << "[IniParser::getAllProperties] (ERROR): No file loaded." << "\n";
+    }
+
+    return parser->getAllProperties();
+}
+
+const std::vector<std::pair<std::string, std::string>> IniParser::getAllProperties(const std::string section)
+{
+    if (!loaded)
+    {
+        std::cerr << "[IniParser::getAllProperties] (ERROR): No file loaded." << "\n";
+    }
+
+    return parser->getAllProperties(section);
 }
